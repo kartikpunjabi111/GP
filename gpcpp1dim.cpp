@@ -23,18 +23,20 @@ float Cov=1;
 MatrixXd KTT(dim_i,dim_j);  // bigger whole clubbed matrix 
 MatrixXd Ktt(1,1); //correspnds to E(x),E(y)
 MatrixXd KtT(1,dim_i);//correspnds to E(xy) 
+MatrixXd X(dim_i,1);
+MatrixXd Y(dim_j,1);
 
-double sigma(int a,int b,int Xi[],int Xj[])
+double sigma(int a,int b,MatrixXd A,MatrixXd B)
 	{
-		return exp(-pow(Xi[a]-Xj[b],2)/(2*Cov));
+		return exp(-pow(A(1,a)-B(1,b),2)/(2*Cov));
 	}
-void kernel(int Xi[],int Xj[])
+void kernel(MatrixXd A,MatrixXd B)
 	{
 		for(int i=0;i<dim_i;i++)
 		{
 			for(int j=0;j<dim_j;j++)
 			{
-				KTT(i,j)=sigma(i,j,Xi,Xj);
+				KTT(i,j)=sigma(i,j,A,B);
 
 			}
 		}
@@ -47,13 +49,13 @@ int main()
 	int X[21];
 	int Y[21];
 	for(int i=0;i<21;i++)
-		{X[i]=i;}
+		{X(i,0)=i-10;}
 	for(int i=0;i<21;i++)
-		{Y[i]=X[i]*X[i]*X[i];}
+		{Y(i,0)=pow(X(i,0),3);}
 	for(int i=0;i<21;i++)
-	{printf("X[%d] = %d \n",i,X[i] );}
+	{printf("X[%d] = %d \n",i,X(i,0) );}
 	for(int i=0;i<21;i++)
-	{printf("Y[%d] = %d \n",i,Y[i] );}
+	{printf("Y[%d] = %d \n",i,Y(i,0) );}
 double sum=0;
 for(int i=0;i<21;i++){
 	sum = sum + pow(X[i],2);
