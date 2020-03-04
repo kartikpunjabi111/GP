@@ -42,6 +42,30 @@ void kernel(MatrixXd A,MatrixXd B)
 		}
 	}
 
+
+	
+void predictYfor(float Xtest)
+{
+	ymean=KtT.transpose()*KTT.inverse()*Y;
+	yvariance=Ktt*KTT.inverse()*KtT;
+	cout<<"Y for Xtest="<<Xtest<<"is "<<ymean;
+	cout<<"Variance of y="<<ymean<<"is "<<yvariance;
+}
+
+void calcCov()
+{
+
+double sum=0;
+for(int i=0;i<dim_i;i++){
+	sum = sum + pow(X(i,0),2);
+}
+Cov=((double)sum)/dim_i;
+cout<<"Covariance"<<Cov<<endl;
+}
+
+
+
+
 int main()
 { double Xtest;
 	float y=0,yvar=0;
@@ -56,12 +80,9 @@ int main()
 	{printf("X[%d] = %d \n",i,X(i,0) );}
 	for(int i=0;i<21;i++)
 	{printf("Y[%d] = %d \n",i,Y(i,0) );}
-double sum=0;
-for(int i=0;i<21;i++){
-	sum = sum + pow(X[i],2);
-}
-Cov=((double)sum)/21;
-cout<<"Covariance"<<Cov<<endl;
+calcCov();
+
+
 kernel(X,X);
 cout<<"KTT: "<<KTT<<endl;
 
@@ -79,16 +100,15 @@ for(int i=0;i<21;i++){
 	cout<<"Exp val"<< exp(-pow(Xtest-X[i],2)/(2*Cov))<<endl;
 }
 
-		cout<<"done1"<<endl;
-MatrixXd temp(1,21);
-temp=KtT*KTT.inverse();
-cout<<temp<<endl;
-for(int i=0;i<21;i++)
-	{y+=temp(0,i)*Y[i];}
-cout<<"done1"<<endl;
-cout<<"output: "<<y<<endl;
+// 		cout<<"done1"<<endl;
+// MatrixXd temp(1,21);
+// temp=KtT*KTT.inverse();
+// cout<<temp<<endl;
+// for(int i=0;i<21;i++)
+// 	{y+=temp(0,i)*Y[i];}
+// cout<<"done1"<<endl;
+// cout<<"output: "<<y<<endl;
+
+predictYfor(Xtest);
 	return 0;
 }
-
-	
-
