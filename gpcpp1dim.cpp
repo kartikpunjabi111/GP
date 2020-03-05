@@ -20,36 +20,38 @@ float Cov=1;
 //tt test-test
 //tT test-Train
 
-MatrixXd KTT(dim_i,dim_j);  // bigger whole clubbed matrix 
+MatrixXd KTT(dim_i,dim_i);  // bigger whole clubbed matrix 
 MatrixXd Ktt(1,1); //correspnds to E(x),E(y)
 MatrixXd KtT(1,dim_i);//correspnds to E(xy) 
 MatrixXd X(dim_i,1);
-MatrixXd Y(dim_j,1);
+MatrixXd Y(dim_i,1);
+// double sigma(int a,int b,MatrixXd A,MatrixXd B)
+// 	{printf("df");
+// 		return exp(-pow(A(a,1)-B(b,1),2)/(2*Cov));
+// 	}
 
-double sigma(int a,int b,MatrixXd A,MatrixXd B)
-	{
-		return exp(-pow(A(1,a)-B(1,b),2)/(2*Cov));
-	}
 void kernel(MatrixXd A,MatrixXd B)
 	{
-		for(int i=0;i<dim_i;i++)
+		for(int i=0;i<A.rows();i++)
 		{
-			for(int j=0;j<dim_j;j++)
-			{
-				KTT(i,j)=sigma(i,j,A,B);
-
+			for(int j=0;j<B.rows();j++)
+			{	KTT(i,j)=exp(-pow(A(i,0)-B(j,0),2)/(2*Cov));
+				
 			}
 		}
 	}
 
-
 	
 void predictYfor(float Xtest)
-{
-	ymean=KtT.transpose()*KTT.inverse()*Y;
-	yvariance=Ktt*KTT.inverse()*KtT;
+{float ymean,yvariance;
+	cout<<"chala";
+	cout<<KtT;
+	cout<<KTT.inverse();
+	cout<<Y;
+	ymean=(KtT*KTT.inverse()*Y).determinant();
+	//yvariance=(Ktt*KTT.inverse()*KtT.transpose()).determinant();
 	cout<<"Y for Xtest="<<Xtest<<"is "<<ymean;
-	cout<<"Variance of y="<<ymean<<"is "<<yvariance;
+	//cout<<"Variance of y="<<ymean<<"is "<<yvariance;
 }
 
 void calcCov()
@@ -69,36 +71,22 @@ cout<<"Covariance"<<Cov<<endl;
 int main()
 { double Xtest;
 	float y=0,yvar=0;
-	Xtest=12;
-	int X[21];
-	int Y[21];
+	Xtest=15;
+	
 	for(int i=0;i<21;i++)
-		{X(i,0)=i-10;}
+		{	X(i,0)=i-10;	}
 	for(int i=0;i<21;i++)
 		{Y(i,0)=pow(X(i,0),3);}
+	cout<<"X"<<X;
+	cout<<"Y"<<Y;
+	calcCov();
+	kernel(X,X);
+	cout<<"KTT: "<<KTT<<endl;
 	for(int i=0;i<21;i++)
-	{printf("X[%d] = %d \n",i,X(i,0) );}
-	for(int i=0;i<21;i++)
-	{printf("Y[%d] = %d \n",i,Y(i,0) );}
-calcCov();
-
-
-kernel(X,X);
-cout<<"KTT: "<<KTT<<endl;
-
-for(int i=0;i<dim_i;i++)
-		{
-			for(int j=0;j<dim_j;j++)
-			{
-				printf("KTT(%d,%d)=%f \n",i,j,KTT(i,j));
-
-			}
-		}
-
-for(int i=0;i<21;i++){
-	KtT(0,i)=exp(-pow(Xtest-X[i],2)/(2*Cov));
-	cout<<"Exp val"<< exp(-pow(Xtest-X[i],2)/(2*Cov))<<endl;
-}
+	{
+		KtT(0,i)=exp(-pow(Xtest-X(i,0),2)/(2*Cov));
+		cout<<"Exp val"<< exp(-pow(Xtest-X(i,0),2)/(2*Cov))<<endl;
+	}
 
 // 		cout<<"done1"<<endl;
 // MatrixXd temp(1,21);
