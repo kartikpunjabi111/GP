@@ -88,6 +88,14 @@ int main()
 		cout<<"Exp val"<< exp(-pow(Xtest-X(i,0),2)/(2*Cov))<<endl;
 	}
 
+// 		cout<<"done1"<<endl;
+// MatrixXd temp(1,21);
+// temp=KtT*KTT.inverse();
+// cout<<temp<<endl;
+// for(int i=0;i<21;i++)
+// 	{y+=temp(0,i)*Y[i];}
+// cout<<"done1"<<endl;
+// cout<<"output: "<<y<<endl;
 
 predictYfor(Xtest);
 	return 0;
