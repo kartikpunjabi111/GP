@@ -7,96 +7,99 @@
 #include <stdlib.h>
 #include <bits/stdc++.h>
 #include <fstream>
-#include <complex>
-#include <iostream>
-#include<iostream>
 #include "math.h"
 using namespace std;
 using namespace Eigen;
-int dim_i=21;
-int dim_j=21;
-float Cov=1;
-//TT Train-Train
-//tt test-test
-//tT test-Train
-
-MatrixXd KTT(dim_i,dim_i);  // bigger whole clubbed matrix 
-MatrixXd Ktt(1,1); //correspnds to E(x),E(y)
-MatrixXd KtT(1,dim_i);//correspnds to E(xy) 
-MatrixXd X(dim_i,1);
-MatrixXd Y(dim_i,1);
-// double sigma(int a,int b,MatrixXd A,MatrixXd B)
-// 	{printf("df");
-// 		return exp(-pow(A(a,1)-B(b,1),2)/(2*Cov));
-// 	}
-
-void kernel(MatrixXd A,MatrixXd B)
+float points=21; //number of training samples
+struct Vector
 	{
-		for(int i=0;i<A.rows();i++)
+	MatrixXd A(6,1);    	//	[x,y,theta,v,a,delta]
+	};
+Vector datasetX[points];  			// arrray of matrices with knoweldge of all points
+Vector datasetY[points];
+
+typedef Matrix<Vector, Dynamic, Dynamic> MatrixMf
+MatrixXd KTT(points,points);//TT Train-Train
+MatrixXd Ktt(points,1);//tt test-test
+MatrixMf KtT(1,points);//tT test-Train
+MatrixMf Y(points,1);
+MatrixXd Cov(6,6);
+Vector Xmue;
+void calc_KTT()
+	{
+		for(int i=0;i<points;i++)
 		{
-			for(int j=0;j<B.rows();j++)
-			{	KTT(i,j)=exp(-pow(A(i,0)-B(j,0),2)/(2*Cov));
-				
+			for(int j=0;j<points;j++)
+			{	KTT(i,j)=exp((datasetX[i]-datasetX[j]).transpose()*Cov.inverse()*(datasetX[i]-datasetX[j]));
 			}
 		}
 	}
+void calc_Cov()
+	{Cov<<0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0;
+	for(int i=0;i<points;i++)
+		{
+			Cov+=datasetX[i]*datasetX[i].transpose();
+		}
+	Cov=Cov/points;
+	cout<<"Covariance"<<Cov<<endl;
+	}
+	cout<<"KTT: "<<KTT<<endl;
+void calc_Ktt()
+	for(int i=0;i<points;i++)
+	{
+		KtT(0,i)=exp((Xtest-datasetX[j]).transpose()*Cov.inverse()*(Xtest-datasetX[j]));
+	}
+void calcXmue()
+	{Xmue<<0,0,0,0,0,0;
+		for(int i=0;i<points;i++)
+		{
+			Xmue+=datasetX[i];
+		}
+		Xmue=Xmue/points;
+	}
+void Xupdate_mean_normalized()
+	{for(int r=0;r<6;r++)
+		{for(i=0;i<points;i++)
+			{datasetX[i](r,0)=datasetX[i](r,0)-Xmue(r,0);}}
+	}
+void predictYfor(Vector Xtest)
+	{	float ymean,yvariance;
+		cout<<"chala";
+		cout<<KtT;
+		cout<<KTT.inverse();
+		cout<<Y;
+		ymean=(KtT*KTT.inverse()*Y).determinant();
+		//yvariance=(Ktt*KTT.inverse()*KtT.transpose()).determinant();
+		cout<<"Y for Xtest="<<Xtest<<"is "<<ymean;
+		//cout<<"Variance of y="<<ymean<<"is "<<yvariance;
+	}
 
-	
-void predictYfor(float Xtest)
-{float ymean,yvariance;
-	cout<<"chala";
-	cout<<KtT;
-	cout<<KTT.inverse();
-	cout<<Y;
-	ymean=(KtT*KTT.inverse()*Y).determinant();
-	//yvariance=(Ktt*KTT.inverse()*KtT.transpose()).determinant();
-	cout<<"Y for Xtest="<<Xtest<<"is "<<ymean;
-	//cout<<"Variance of y="<<ymean<<"is "<<yvariance;
-}
-
-void calcCov()
-{
-
-double sum=0;
-for(int i=0;i<dim_i;i++){
-	sum = sum + pow(X(i,0),2);
-}
-Cov=((double)sum)/dim_i;
-cout<<"Covariance"<<Cov<<endl;
-}
-
-
-
-
+void get_y(int num)
+	{for(int i=0;i<points;i++)
+		{
+			Y(i,0)=datasetY[i](num-1,0);
+		}
+	}
 int main()
-{ double Xtest;
-	float y=0,yvar=0;
-	Xtest=15;
+{ Vector Xtest;
+	Xtest<<1,1,1,1,1,1;
 	
+	//initialization random training data
 	for(int i=0;i<21;i++)
 		{	X(i,0)=i-10;	}
 	for(int i=0;i<21;i++)
 		{Y(i,0)=pow(X(i,0),3);}
+
 	cout<<"X"<<X;
 	cout<<"Y"<<Y;
-	calcCov();
-	kernel(X,X);
-	cout<<"KTT: "<<KTT<<endl;
-	for(int i=0;i<21;i++)
-	{
-		KtT(0,i)=exp(-pow(Xtest-X(i,0),2)/(2*Cov));
-		cout<<"Exp val"<< exp(-pow(Xtest-X(i,0),2)/(2*Cov))<<endl;
-	}
 
-// 		cout<<"done1"<<endl;
-// MatrixXd temp(1,21);
-// temp=KtT*KTT.inverse();
-// cout<<temp<<endl;
-// for(int i=0;i<21;i++)
-// 	{y+=temp(0,i)*Y[i];}
-// cout<<"done1"<<endl;
-// cout<<"output: "<<y<<endl;
+	calcXmue();
+	Xupdate_mean_normalized();
+	calc_Cov();  // sigma square matrix
+	calc_KTT();
+	calc_Ktt(); 
+	get_y(1);  // 1st training to predict for component 1st
+	predictYfor(Xtest);
 
-predictYfor(Xtest);
 	return 0;
 }
