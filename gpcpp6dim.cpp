@@ -7,22 +7,18 @@
 #include <stdlib.h>
 #include <bits/stdc++.h>
 #include <fstream>
+#define points 21 //number of training samples
 #include "math.h"
 using namespace std;
 using namespace Eigen;
-float points=21; //number of training samples
-struct Vector
-	{
-	MatrixXd A(6,1);    	//	[x,y,theta,v,a,delta]
-	};
+typedef Matrix<float, 6, 1> Vector;
+//Vector=[x,y,theta,v,a,delta]
 Vector datasetX[points];  			// arrray of matrices with knoweldge of all points
 Vector datasetY[points];
-
-typedef Matrix<Vector, Dynamic, Dynamic> MatrixMf
 MatrixXd KTT(points,points);//TT Train-Train
 MatrixXd Ktt(points,1);//tt test-test
-MatrixMf KtT(1,points);//tT test-Train
-MatrixMf Y(points,1);
+MatrixXd KtT(1,points);//tT test-Train
+// MatrixMf Y(points,1);
 MatrixXd Cov(6,6);
 Vector Xmue;
 void calc_KTT()
@@ -44,6 +40,7 @@ void calc_Cov()
 	cout<<"Covariance"<<Cov<<endl;
 	}
 	cout<<"KTT: "<<KTT<<endl;
+	
 void calc_Ktt()
 	for(int i=0;i<points;i++)
 	{
@@ -85,13 +82,13 @@ int main()
 	Xtest<<1,1,1,1,1,1;
 	
 	//initialization random training data
-	for(int i=0;i<21;i++)
-		{	X(i,0)=i-10;	}
-	for(int i=0;i<21;i++)
-		{Y(i,0)=pow(X(i,0),3);}
+	// for(int i=0;i<21;i++)
+	// 	{	X(i,0)=i-10;	}
+	// for(int i=0;i<21;i++)
+	// 	{Y(i,0)=pow(X(i,0),3);}
 
-	cout<<"X"<<X;
-	cout<<"Y"<<Y;
+	// cout<<"X"<<X;
+	// cout<<"Y"<<Y;
 
 	calcXmue();
 	Xupdate_mean_normalized();
