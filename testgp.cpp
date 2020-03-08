@@ -13,33 +13,28 @@ using namespace std;
 using namespace Eigen;
 typedef Matrix<float, 6, 1> Vector;
 typedef Matrix<Vector, 1, points> Fux;
-
 //Vector=[x,y,theta,v,a,delta]
-Fux datasetX[points];  			// arrray of matrices with knoweldge of all points
-Fux datasetY[points];
+Fux datasetX,datasetY;  			// arrray of matrices with knoweldge of all points
+// Vector datasetY[points];
 MatrixXd KTT(points,points);//TT Train-Train
 MatrixXd Ktt(points,1);//tt test-test
 MatrixXd KtT(1,points);//tT test-Train
-MatrixXd Y(points,1);	
+MatrixXf Y(points,1);
 // MatrixMf Y(points,1);
 MatrixXf Cov(6,6);
 Vector Xmue;
-// void calc_KTT()
-// 	{
-// 		for(int i=0;i<points;i++)
-// 		{
-// 			for(int j=0;j<points;j++)
-// 			{	KTT(i,j)=exp((datasetX[i]-datasetX[j]).transpose()*Cov.inverse()*(datasetX[i]-datasetX[j]));
-// 			}
-// 		}
-// 	}
+Vector Xtest;
+void calc_KTT()
+	{
+		for(int i=0;i<points;i++)
+		{
+			for(int j=0;j<points;j++)
+			{	KTT(i,j)=exp((datasetX[i]-datasetX[j]).transpose()*Cov.inverse()*(datasetX[i]-datasetX[j]));
+			}
+		}
+	}
 void calc_Cov()
-	{Cov<<0,0,0,0,0,0
-		 ,0,0,0,0,0,0
-		 ,0,0,0,0,0,0
-		 ,0,0,0,0,0,0
-		 ,0,0,0,0,0,0
-		 ,0,0,0,0,0,0;
+	{Cov<<0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0;
 	for(int i=0;i<points;i++)
 		{
 			Cov+=datasetX[i]*datasetX[i].transpose();
@@ -49,12 +44,12 @@ void calc_Cov()
 	
 	cout<<"KTT: "<<KTT<<endl;
 	}
-
-// void calc_Ktt()
-// 	for(int i=0;i<points;i++)
-// 	{
-// 		KtT(0,i)=exp((Xtest-datasetX[j]).transpose()*Cov.inverse()*(Xtest-datasetX[j]));
-// 	}
+	
+void calc_Ktt()
+	{for(int i=0;i<points;i++)
+	{
+		KtT(0,i)=exp((Xtest-datasetX[j]).transpose()*Cov.inverse()*(Xtest-datasetX[j]));
+	}}
 void calcXmue()
 	{Xmue<<0,0,0,0,0,0;
 		for(int i=0;i<points;i++)
@@ -66,8 +61,7 @@ void calcXmue()
 void Xupdate_mean_normalized()
 	{for(int r=0;r<6;r++)
 		{for(int i=0;i<points;i++)
-			{datasetX[i](r,0)=datasetX[i](r,0)-Xmue[r];}
-		}
+			{datasetX[i](r,0)=datasetX[i](r,0)-Xmue(r,0);}}
 	}
 void predictYfor(Vector Xtest)
 	{	float ymean,yvariance;
@@ -88,26 +82,31 @@ void get_y(int num)
 		}
 	}
 int main()
-{ Vector Xtest;
+{ 
+ 
 	Xtest<<1,1,1,1,1,1;
-	
-	//initialization random training data
-	// for(int i=0;i<21;i++)
-	// 	{	X(i,0)=i-10;	}
-	// for(int i=0;i<21;i++)
-	// 	{Y(i,0)=pow(X(i,0),3);}
+	Xmue<<1,2,13244,4,5,6;
 
-	// cout<<"X"<<X;
-	// cout<<"Y"<<Y;
+	datasetX[1]<<1,1,13245,1,1,1;
+	datasetX[2]<<2,1,1,1,1,1;
+	datasetX[1](2,0)=datasetX[1](2,0)-Xmue(2,0);
+	//for(int i=0;i<points;i++)Xmue.rows()
+	cout<<datasetX[1]<<endl<<endl;
+	 Cov=datasetX[1]*(datasetX[2]).transpose();
+cout<<"elemental"<<datasetX[1]*datasetX[1].transpose();
+cout<<"Xmue.rows()"<< datasetX[1].transpose().rows();
+cout<<"Cov"<<Cov;
+
+	
+	Cov=(datasetX[1])*(datasetX[1].transpose());	//initialization random training data
 
 	calcXmue();
 	Xupdate_mean_normalized();
 	calc_Cov();  // sigma square matrix
-	// calc_KTT();
-	// calc_Ktt(); 
+	calc_KTT();
+	calc_Ktt(); 
 	get_y(1);  // 1st training to predict for component 1st
 	predictYfor(Xtest);
 
 	return 0;
 }
-using namespace Eigen;
