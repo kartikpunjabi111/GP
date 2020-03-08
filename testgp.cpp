@@ -46,10 +46,14 @@ void calc_Cov()
 	}
 	
 void calc_Ktt()
+	
 	{for(int i=0;i<points;i++)
-	{
-		KtT(0,i)=exp((Xtest-datasetX[j]).transpose()*Cov.inverse()*(Xtest-datasetX[j]));
-	}}
+			{
+			KtT(0,i)=exp((Xtest-datasetX[i]).transpose()*Cov.inverse()*(Xtest-datasetX[i]));
+			}
+		}
+
+
 void calcXmue()
 	{Xmue<<0,0,0,0,0,0;
 		for(int i=0;i<points;i++)
@@ -69,7 +73,7 @@ void predictYfor(Vector Xtest)
 		cout<<KtT;
 		cout<<KTT.inverse();
 		cout<<Y;
-		ymean=(KtT*KTT.inverse()*Y).determinant();
+		// ymean=(KtT*KTT.inverse()*Y).determinant();
 		//yvariance=(Ktt*KTT.inverse()*KtT.transpose()).determinant();
 		cout<<"Y for Xtest="<<Xtest<<"is "<<ymean;
 		//cout<<"Variance of y="<<ymean<<"is "<<yvariance;
