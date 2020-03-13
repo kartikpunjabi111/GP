@@ -24,6 +24,7 @@ MatrixXf Y(points,1);
 MatrixXf Cov(6,6);
 Vector Xmue;
 Vector Xtest;
+Vector Yttest;
 void calc_KTT()
 	{
 		for(int i=0;i<points;i++)
