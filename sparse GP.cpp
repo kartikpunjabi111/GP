@@ -1,3 +1,6 @@
+sparse GP
+
+
 #include <unistd.h>
 #include "vector"
 #include <eigen3/Eigen/Dense>
@@ -29,17 +32,6 @@ MatrixXd Cov(6,6);
 Vector Xmue;
 Vector Xtest;
 Vector Yttest;
-
-MatrixXd sparseK(6,4);
-Vector a;
-Vector b;
-Vector c;
-Vector d;
-a<<1,2,3,4,5,6;
-b<<1,2,3,4,5,6;
-d<<1,2,3,4,5,6;
-c<<1,2,3,4,5,6;
-
 void calc_KTT()
 	{
 		for(int i=0;i<points;i++)
@@ -111,34 +103,29 @@ void get_y(int num)
 
 int main()
 { 
-
-
-	sparseK<<a,b,c,d;
-	cout<<sparseK;
-}
  
-	// Xtest<<1,1,1,1,1,1;
-	// Xmue<<1,2,13244,4,5,6;
+	Xtest<<1,1,1,1,1,1;
+	Xmue<<1,2,13244,4,5,6;
 
-	// datasetX[1]<<1,1,13245,1,1,1;
-	// datasetX[2]<<2,1,1,1,1,1;
-	// datasetX[1](2,0)=datasetX[1](2,0)-Xmue(2,0);
-	// //for(int i=0;i<points;i++)Xmue.rows()
-	// //cout<<datasetX[1]<<endl<<endl;
-	// Cov=datasetX[1]*(datasetX[2]).transpose();
-	// //cout<<"elemental"<<datasetX[1]*datasetX[1].transpose();
-	// //cout<<"Xmue.rows()"<< datasetX[1].transpose().rows();
-	// //cout<<"Cov"<<Cov;
+	datasetX[1]<<1,1,13245,1,1,1;
+	datasetX[2]<<2,1,1,1,1,1;
+	datasetX[1](2,0)=datasetX[1](2,0)-Xmue(2,0);
+	//for(int i=0;i<points;i++)Xmue.rows()
+	//cout<<datasetX[1]<<endl<<endl;
+	Cov=datasetX[1]*(datasetX[2]).transpose();
+	//cout<<"elemental"<<datasetX[1]*datasetX[1].transpose();
+	//cout<<"Xmue.rows()"<< datasetX[1].transpose().rows();
+	//cout<<"Cov"<<Cov;
 
 	
-	// Cov=(datasetX[1])*(datasetX[1].transpose());	//initialization random training data
+	Cov=(datasetX[1])*(datasetX[1].transpose());	//initialization random training data
 
-	// calcXmue();
-	// Xupdate_mean_normalized();
-	// calc_Cov();  // sigma square matrix
-	// calc_KTT();
-	// calc_Ktt(); 
-	// get_y(1);  // 1st training to predict for component 1st
-	// predictYfor(Xtest);
+	calcXmue();
+	Xupdate_mean_normalized();
+	calc_Cov();  // sigma square matrix
+	calc_KTT();
+	calc_Ktt(); 
+	get_y(1);  // 1st training to predict for component 1st
+	predictYfor(Xtest);
 	return 0;
 }
